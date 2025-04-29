@@ -1,28 +1,28 @@
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../services/firebase";
 import { useNavigate } from "react-router-dom";
 
-function Login() {
+function Register() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await createUserWithEmailAndPassword(auth, email, password);
       navigate("/");
     } catch (err) {
-      setError("Error al iniciar sesión. Verifica tus credenciales.");
+      setError("Error al registrarse. Intenta con otro correo.");
     }
   };
 
   return (
     <div className="container mt-5">
-      <h2>Iniciar Sesión</h2>
-      <form onSubmit={handleLogin}>
+      <h2>Registrarse</h2>
+      <form onSubmit={handleRegister}>
         <div className="mb-3">
           <label className="form-label">Correo electrónico</label>
           <input
@@ -44,12 +44,12 @@ function Login() {
           />
         </div>
         {error && <div className="alert alert-danger">{error}</div>}
-        <button type="submit" className="btn btn-primary">
-          Ingresar
+        <button type="submit" className="btn btn-success">
+          Registrarse
         </button>
       </form>
     </div>
   );
 }
 
-export default Login;
+export default Register;
