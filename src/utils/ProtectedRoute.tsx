@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuthStore } from "../store/AuthStore";
 import { ReactNode } from "react";
 
 interface ProtectedRouteProps {
@@ -11,7 +11,7 @@ function ProtectedRoute({
   children,
   adminRequired = false,
 }: ProtectedRouteProps) {
-  const { user } = useAuth();
+  const { user } = useAuthStore();
 
   if (!user) {
     return <Navigate to="/login" />;

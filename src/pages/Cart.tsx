@@ -3,13 +3,14 @@
 import { useCartStore, CartItem } from "../store/CartStore";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { ButtonGroup, ToggleButton } from "react-bootstrap";
+import { Badge, ButtonGroup, ToggleButton } from "react-bootstrap";
 import { useCouponStore, validateCoupon } from "../store/CouponStore";
 import { toast } from "react-toastify";
 
 const Cart = () => {
   const { cart, removeFromCart, clearCart, addToCart } = useCartStore();
-  const { discount, setCoupon, resetCoupon } = useCouponStore();
+  const { discount, setCoupon, resetCoupon, couponApplied, couponCode } =
+    useCouponStore();
   const [coupon, setCouponInput] = useState<string>(""); // Para el campo de cupón
 
   const [view, setView] = useState<"grid" | "list">("grid"); // 'grid' para tarjetas, 'list' para tabla
@@ -43,6 +44,13 @@ const Cart = () => {
     );
     if (confirmDelete) {
       removeFromCart(productId);
+    }
+  };
+
+  const handleClearCart = () => {
+    const confirmClear = window.confirm("¿Estás seguro de vaciar el carrito?");
+    if (confirmClear) {
+      clearCart();
     }
   };
 
@@ -246,19 +254,38 @@ const Cart = () => {
           </button>
         </div>
 
-        {discount > 0 && (
-          <p className="text-success">Descuento aplicado: {discount}%</p>
+        {couponApplied && (
+          <>
+            <p className="text-success">
+              Descuento aplicado: {discount}% (- $
+              {(totalPrice * (discount / 100)).toFixed(2)})
+            </p>
+            <div className="flex gap-6">
+              <Badge bg="success" className="p-2">
+                Cupón aplicado: {couponCode}
+              </Badge>
+              <button
+                className="btn btn-sm btn-outline-danger"
+                onClick={resetCoupon}
+              >
+                Quitar cupón
+              </button>
+            </div>
+          </>
         )}
-
+        <br />
         <h4>Total: ${totalWithDiscount.toFixed(2)}</h4>
       </div>
 
       {/* Mostrar total y botones de acción */}
       <div className="d-flex justify-content-between align-items-center mt-4">
-        <h4>Total: ${totalPrice.toFixed(2)}</h4>
+        <h4>Total: ${totalWithDiscount.toFixed(2)}</h4>
 
         <div>
-          <button className="btn btn-outline-danger me-2" onClick={clearCart}>
+          <button
+            className="btn btn-outline-danger me-2"
+            onClick={handleClearCart}
+          >
             Vaciar carrito
           </button>
           <Link to="/shop" className="btn btn-secondary me-2">

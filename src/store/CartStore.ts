@@ -19,12 +19,14 @@ type CartState = {
   addToCart: (product: Product) => void;
   removeFromCart: (productId: number) => void;
   clearCart: () => void;
+  applyCoupon: (code: string, discount: number) => void;
 };
 
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       cart: [],
+
       addToCart: (product) => {
         const cart = get().cart;
         const existingItem = cart.find((item) => item.id === product.id);
@@ -40,13 +42,24 @@ export const useCartStore = create<CartState>()(
           set({ cart: [...cart, { ...product, quantity: 1 }] });
         }
       },
+
       removeFromCart: (productId) => {
         set({
           cart: get().cart.filter((item) => item.id !== productId),
         });
       },
+
       clearCart: () => {
         set({ cart: [] });
+      },
+
+      applyCoupon: (_code, discount) => {
+        set({
+          cart: get().cart.map((item) => ({
+            ...item,
+            price: item.price * (1 - discount / 100),
+          })),
+        });
       },
     }),
     {

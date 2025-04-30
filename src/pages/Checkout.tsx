@@ -1,10 +1,13 @@
-// src/pages/Checkout.tsx
-
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { db } from "../services/firebase";
 import { useCartStore } from "../store/CartStore";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuthStore } from "../store/AuthStore";
+import { toast } from "react-toastify";
 
 const Checkout = () => {
+  const { user } = useAuthStore();
   const { cart, clearCart } = useCartStore();
   const navigate = useNavigate();
 
@@ -12,17 +15,37 @@ const Checkout = () => {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
 
-  const handleOrder = () => {
-    if (!name || !phone || !address) {
-      alert("Por favor completa todos los campos");
-      return;
+  const handleConfirmOrder = async () => {
+    if (!user) return;
+
+    const items = cart.map((item) => ({
+      productId: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+    }));
+
+    const order = {
+      userId: user.uid,
+      userEmail: user.email,
+      createdAt: serverTimestamp(),
+      name,
+      phone,
+      address,
+      total: cart.reduce((acc, item) => acc + item.price * item.quantity, 0),
+      items,
+    };
+
+    try {
+      await addDoc(collection(db, "orders"), order);
+      toast.success("Pedido confirmado con éxito");
+      clearCart();
+      navigate("/orders"); // Redirigir a la página de pedidos
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Error desconocido";
+      toast.error(`Error al guardar la orden: ${errorMessage}`);
     }
-
-    // Aquí simularíamos enviar el pedido a Firestore o WhatsApp
-    console.log("Orden enviada:", { name, phone, address, cart });
-
-    clearCart();
-    navigate("/thanks");
   };
 
   if (cart.length === 0) {
@@ -84,7 +107,7 @@ const Checkout = () => {
           <button
             type="button"
             className="btn btn-success"
-            onClick={handleOrder}
+            onClick={handleConfirmOrder}
           >
             Confirmar Pedido
           </button>
