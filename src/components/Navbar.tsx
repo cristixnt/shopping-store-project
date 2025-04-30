@@ -19,7 +19,7 @@ function Navbar() {
     <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
       <div className="container">
         <Link className="navbar-brand fw-bold" to="/">
-          <img src="src/assets/shop.svg" width={30} className="mr-3"></img>
+          <img src="src/assets/shop.png" width={30} className="mr-3"></img>
           E-commerce Gen
         </Link>
 

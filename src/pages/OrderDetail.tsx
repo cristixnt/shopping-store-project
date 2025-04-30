@@ -5,6 +5,7 @@ import { db } from "../services/firebase";
 import { Order } from "./MyOrders";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import logo from "../assets/shop.png";
 
 function OrderDetail() {
   const { id } = useParams<{ id: string }>();
@@ -17,12 +18,25 @@ function OrderDetail() {
 
     const canvas = await html2canvas(element);
     const imgData = canvas.toDataURL("image/png");
+
     const pdf = new jsPDF();
+
+    // 1. Logo y encabezado
+    const logoImg = new Image();
+    logoImg.src = logo; // usa import logo from '../assets/logo.png' si está en tu proyecto
+
+    pdf.setFontSize(14);
+    pdf.text("Detalle del Pedido", 105, 20, { align: "center" });
+
+    // Opcional: si deseas incluir el logo
+    pdf.addImage(logo, "PNG", 15, 10, 15, 15); // x, y, width, height
+
+    // 2. Añade imagen del HTML convertido a PNG (desde y=30 para que no tape el header)
     const imgProps = pdf.getImageProperties(imgData);
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.addImage(imgData, "PNG", 0, 30, pdfWidth, pdfHeight);
     pdf.save(`pedido-${order?.id}.pdf`);
   };
 
