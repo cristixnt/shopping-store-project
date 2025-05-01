@@ -21,7 +21,7 @@ const Cart = () => {
   };
 
   // Reducir cantidad
-  const decreaseQuantity = (productId: number) => {
+  const decreaseQuantity = (productId?: string) => {
     const product = cart.find((item) => item.id === productId);
     if (!product) return;
 
@@ -38,7 +38,7 @@ const Cart = () => {
     }
   };
 
-  const handleRemoveItem = (productId: number) => {
+  const handleRemoveItem = (productId?: string) => {
     const confirmDelete = window.confirm(
       "¿Estás seguro de eliminar este producto?"
     );

@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 import { createJSONStorage } from "zustand/middleware";
 
 export type Product = {
-  id: number;
+  id?: string;
   name: string;
   price: number;
   description: string;
@@ -12,12 +12,16 @@ export type Product = {
   stock: number;
 };
 
-export type CartItem = Product & { quantity: number };
+export type CartItem = Product & {
+  quantity: number;
+  coupon?: string;
+  totalWithCoupon?: number;
+};
 
 type CartState = {
   cart: CartItem[];
   addToCart: (product: Product) => void;
-  removeFromCart: (productId: number) => void;
+  removeFromCart: (productId?: string) => void;
   clearCart: () => void;
   applyCoupon: (code: string, discount: number) => void;
 };

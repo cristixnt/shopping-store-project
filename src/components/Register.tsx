@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../services/firebase";
+import { auth, db } from "../services/firebase"; // Asegúrate de tener db importado para Firestore
+import { doc, setDoc } from "firebase/firestore"; // Para guardar en Firestore
 import { useNavigate } from "react-router-dom";
 
 function Register() {
@@ -12,8 +13,22 @@ function Register() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      navigate("/");
+      // Crear usuario con email y password en Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      // Almacenar información del usuario en Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        email: user.email,
+        createdAt: new Date(),
+        role: "user", // Puedes modificar el rol más tarde
+      });
+
+      navigate("/"); // Redirige a la página principal o a la que desees
     } catch {
       setError("Error al registrarse. Intenta con otro correo.");
     }

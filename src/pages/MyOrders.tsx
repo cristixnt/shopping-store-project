@@ -6,25 +6,28 @@ import {
   where,
   getDocs,
   Timestamp,
+  FieldValue,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
 import { useAuthStore } from "../store/AuthStore";
 import { Link } from "react-router-dom";
 
 export interface Order {
-  id: string;
+  id?: string;
   userId: string;
-  userEmail: string;
-  createdAt: Date | Timestamp;
+  userEmail: string | null;
+  createdAt: Date | Timestamp | FieldValue;
   name: string;
   phone: string;
   address: string;
   total: number;
-  items: OrderItem[];
+  items: OrderItem[] | null;
+  coupon: string | null;
+  totalWithCoupon: number;
 }
 
 export interface OrderItem {
-  productId: string;
+  productId?: string;
   name: string;
   price: number;
   quantity: number;

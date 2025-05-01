@@ -11,14 +11,15 @@ function ProtectedRoute({
   children,
   adminRequired = false,
 }: ProtectedRouteProps) {
-  const { user } = useAuthStore();
+  const { user, role } = useAuthStore(); // Obtenemos el user y el role desde Zustand
 
+  // Si no hay usuario autenticado, redirigir al login
   if (!user) {
     return <Navigate to="/login" />;
   }
 
-  if (adminRequired && !user.email?.includes("admin")) {
-    // Ejemplo sencillo, puedes luego mejorar con roles
+  // Si se requiere un admin y el rol del usuario no es 'admin', redirigir a inicio
+  if (adminRequired && role !== "admin") {
     return <Navigate to="/" />;
   }
 

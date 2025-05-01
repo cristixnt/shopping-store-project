@@ -3,11 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../services/firebase";
 import { useAuthStore } from "../store/AuthStore";
-import { FaHome, FaShoppingBag, FaShoppingCart } from "react-icons/fa";
+import { FaHome, FaLock, FaShoppingBag, FaShoppingCart } from "react-icons/fa";
 import { FaGear, FaRectangleList, FaRightFromBracket } from "react-icons/fa6";
 
 function Navbar() {
-  const { user } = useAuthStore();
+  const { user, role } = useAuthStore();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -57,7 +57,11 @@ function Navbar() {
                 <FaShoppingCart /> Carrito
               </Link>
             </li>
-
+            {role === "admin" && (
+              <Link className="nav-link" to="/admin">
+                <FaLock /> Panel de Admin
+              </Link>
+            )}
             {user ? (
               <>
                 <li className="nav-item dropdown">

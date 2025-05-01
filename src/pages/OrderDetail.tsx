@@ -105,7 +105,7 @@ function OrderDetail() {
             </tr>
           </thead>
           <tbody>
-            {order.items.map((item, i) => (
+            {order.items?.map((item, i) => (
               <tr key={i}>
                 <td>{item.name}</td>
                 <td>{item.quantity}</td>

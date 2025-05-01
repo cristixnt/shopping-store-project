@@ -5,10 +5,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuthStore } from "../store/AuthStore";
 import { toast } from "react-toastify";
+import { sendWhatsApp } from "../utils/WhatsAppUtils";
+import { Order, OrderItem } from "./MyOrders";
+import { useCouponStore } from "../store/CouponStore";
 
 const Checkout = () => {
   const { user } = useAuthStore();
   const { cart, clearCart } = useCartStore();
+  const { discount, resetCoupon, couponCode } = useCouponStore();
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
@@ -18,14 +22,17 @@ const Checkout = () => {
   const handleConfirmOrder = async () => {
     if (!user) return;
 
-    const items = cart.map((item) => ({
-      productId: item.id,
-      name: item.name,
-      price: item.price,
-      quantity: item.quantity,
-    }));
+    const items = cart.map((item) => {
+      const order_item: OrderItem = {
+        productId: item.id?.toString(),
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+      };
+      return order_item;
+    });
 
-    const order = {
+    const order: Order = {
       userId: user.uid,
       userEmail: user.email,
       createdAt: serverTimestamp(),
@@ -34,12 +41,19 @@ const Checkout = () => {
       address,
       total: cart.reduce((acc, item) => acc + item.price * item.quantity, 0),
       items,
+      coupon: couponCode,
+      totalWithCoupon:
+        cart.reduce((acc, item) => acc + item.price * item.quantity, 0) -
+        cart.reduce((acc, item) => acc + item.price * item.quantity, 0) *
+          (discount / 100),
     };
 
     try {
-      await addDoc(collection(db, "orders"), order);
+      const orderRef = await addDoc(collection(db, "orders"), order);
+      sendWhatsApp({ ...order, id: orderRef.id }); // Enviar pedido a WhatsApp
       toast.success("Pedido confirmado con éxito");
       clearCart();
+      resetCoupon(); // Reiniciar el cupón
       navigate("/orders"); // Redirigir a la página de pedidos
     } catch (error) {
       const errorMessage =
