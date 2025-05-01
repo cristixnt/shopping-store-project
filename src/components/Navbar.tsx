@@ -5,6 +5,7 @@ import { auth } from "../services/firebase";
 import { useAuthStore } from "../store/AuthStore";
 import { FaHome, FaLock, FaShoppingBag, FaShoppingCart } from "react-icons/fa";
 import { FaGear, FaRectangleList, FaRightFromBracket } from "react-icons/fa6";
+import shopImage from '../assets/shop.png';
 
 function Navbar() {
   const { user, role } = useAuthStore();
@@ -19,7 +20,7 @@ function Navbar() {
     <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
       <div className="container">
         <Link className="navbar-brand fw-bold" to="/">
-          <img src="src/assets/shop.png" width={30} className="mr-3"></img>
+          <img src={shopImage} width={30} className="mr-3"></img>
           E-commerce Gen
         </Link>
 
