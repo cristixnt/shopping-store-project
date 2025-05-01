@@ -8,6 +8,7 @@ import { Spinner } from "react-bootstrap";
 
 function Home() {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -17,6 +18,7 @@ function Home() {
         ...(doc.data() as Product),
       }));
       setAllProducts(items);
+      setLoading(false);
     };
 
     fetchProducts();
@@ -27,55 +29,59 @@ function Home() {
   const populares = allProducts.slice(-4); // Simulado
 
   const renderSection = (title: string, products: Product[]) => (
-    <Carousel className="mb-5">
+    <div className="mb-5">
       <h3 className="mb-3">{title}</h3>
-      {products.map((product, index) => (
-        <Carousel.Item key={index}>
-          <Link
-            to={`/product/${product.id}`}
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            <img
-              className="d-block w-100"
-              src={product.image}
-              alt={product.name}
-              style={{ height: 200, objectFit: "contain" }}
-            />
-          </Link>
-          <Carousel.Caption className="bg-dark bg-opacity-50 rounded p-2">
-            <h4>{product.name}</h4>
-            <p>${product.price}</p>
-          </Carousel.Caption>
-        </Carousel.Item>
-      ))}
-    </Carousel>
+      <Carousel interval={5000}>
+        {products.map((product, index) => (
+          <Carousel.Item key={index} className="text-center">
+            <Link
+              to={`/product/${product.id}`}
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <div
+                className="d-flex justify-content-center align-items-center"
+                style={{
+                  height: "300px",
+                  background: "#f8f9fa",
+                  borderRadius: "8px",
+                  overflow: "hidden",
+                }}
+              >
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  style={{
+                    maxHeight: "100%",
+                    maxWidth: "100%",
+                    objectFit: "contain",
+                  }}
+                />
+              </div>
+            </Link>
+            <Carousel.Caption className="bg-dark bg-opacity-50 rounded p-2 mt-3">
+              <h5>{product.name}</h5>
+              <p>${product.price}</p>
+            </Carousel.Caption>
+          </Carousel.Item>
+        ))}
+      </Carousel>
+    </div>
   );
 
   return (
     <div className="container mt-5">
       <h1 className="mb-4 text-center">Bienvenido a Nuestra Tienda</h1>
-      {destacados.length <= 0 ? (
-        <div className="d-flex justify-content-center align-items-center w-100 h-100 position-absolute top-0 start-0 bg-light">
+
+      {loading ? (
+        <div className="text-center my-5">
           <Spinner animation="border" />
         </div>
       ) : (
-        renderSection("Productos Destacados", destacados)
-      )}
-      {/* {renderSection("Ofertas Especiales", ofertas)} */}
-      {ofertas.length <= 0 ? (
-        <div className="d-flex justify-content-center align-items-center w-100 h-100 position-absolute top-0 start-0 bg-light">
-          <Spinner animation="border" />
-        </div>
-      ) : (
-        renderSection("Ofertas Especiales", ofertas)
-      )}
-      {/* {renderSection("Más Populares", populares)} */}
-      {populares.length <= 0 ? (
-        <div className="d-flex justify-content-center align-items-center w-100 h-100 position-absolute top-0 start-0 bg-light">
-          <Spinner animation="border" />
-        </div>
-      ) : (
-        renderSection("Más Populares", populares)
+        <>
+          {renderSection("Productos Destacados", destacados)}
+          {renderSection("Ofertas Especiales", ofertas)}
+          {renderSection("Más Populares", populares)}
+        </>
       )}
     </div>
   );
